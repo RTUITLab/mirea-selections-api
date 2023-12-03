@@ -14,6 +14,8 @@ class Nominant(BaseModel):
     short_description: str
     description: str
 
+
+    cover_url: str
     video_url: str
 
     @model_validator(mode='after')

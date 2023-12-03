@@ -15,6 +15,7 @@ class Nominant(Base):
     short_description: Mapped[str]
     description: Mapped[str]
 
+    cover_url: Mapped[str]
     video_url: Mapped[str]
 
     nomination_id = mapped_column(ForeignKey('nominations.id', ondelete='CASCADE'))
