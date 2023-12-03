@@ -24,6 +24,8 @@ class Permission(BaseModel):
 
 
 class UserPermission(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     user_id: UUID
     permission: PermissionNames
     voting_id: UUID | None
@@ -36,4 +38,4 @@ class User(BaseModel):
     name: str
     email: str
 
-    permissions: list[Permission] | None
+    permissions: list[UserPermission] = []

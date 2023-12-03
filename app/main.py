@@ -2,10 +2,14 @@ import asyncio
 from fastapi import FastAPI, Request
 from sse_starlette.sse import EventSourceResponse
 
-import app.models.user
+from app.routers.auth_router import auth_router
+from app.routers.votings_router import votings_router
 
 
 app = FastAPI()
+
+app.include_router(auth_router)
+app.include_router(votings_router)
 
 
 @app.get('/__health')
@@ -23,7 +27,7 @@ async def test_sse(req: Request) -> EventSourceResponse:
                 break
 
             print(count)
-            yield { 'data': count, 'retry': 1 }
+            yield {'data': count, 'retry': 1}
             count += 1
 
             await asyncio.sleep(1)

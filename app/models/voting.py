@@ -1,6 +1,6 @@
 from uuid import UUID, uuid4
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.user import User
 from app.models.nomination import Nomination
@@ -9,17 +9,25 @@ from app.models.nomination import Nomination
 class Voting(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: UUID = uuid4()
-    creation_date: datetime = datetime.now()
+    id: UUID = Field(default_factory=uuid4)
+    creation_date: datetime = Field(default_factory=datetime.utcnow)
     title: str
-    description: str | None
+    description: str
+    active: bool = False
 
-    publish_date: datetime | None
-    start_date: datetime | None
-    finish_date: datetime | None
+    start_date: datetime
+    finish_date: datetime
 
-    users: list[User]
-    nominations: list[Nomination]
+    users: list[User] = []
+    nominations: list[Nomination] = []
+
+
+class CreateVotingReq(BaseModel):
+    title: str
+    description: str = ""
+    start_date: datetime
+    finish_date: datetime
+    admin: UUID | None = None
 
 
 class Voter(BaseModel):
@@ -30,7 +38,7 @@ class Voter(BaseModel):
 
 
 class Vote(BaseModel):
-    vote_date: datetime = datetime.now()
+    vote_date: datetime = Field(default_factory=datetime.utcnow)
     voting_id: str
     nominant_id: str
     voter: Voter
