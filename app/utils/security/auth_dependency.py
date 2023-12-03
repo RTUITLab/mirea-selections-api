@@ -1,5 +1,6 @@
-from uuid import UUID, uuid4
-from fastapi import Depends, HTTPException
+import re
+from uuid import UUID
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import APIKeyHeader
 
 from app.models.user import PermissionNames
@@ -15,8 +16,12 @@ class JwtAuthDep:
     def __init__(self, permission: PermissionNames) -> None:
         self.permission = permission
 
-    def __call__(self, token: str = Depends(auth_scheme)) -> UUID:
+    def __call__(self, req: Request, token: str = Depends(auth_scheme)) -> UUID:
         try:
+            if re.match(r'\/votings\/[a-z0-9\-]{36}\/nominations\/[a-z0-9\-]{36}', req.scope['path']):
+                if token == 'Bearer ' or token == 'Bearer':
+                    return UUID(int=0)
+
             user_id = validate_token(token.split('Bearer ')[1])
             return UUID(user_id)
         except:
