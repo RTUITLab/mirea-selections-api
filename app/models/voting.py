@@ -30,6 +30,10 @@ class CreateVotingReq(BaseModel):
     admin: UUID | None = None
 
 
+class ActiveVotingResp(Voting):
+    users: list[User] = Field(exclude=True)
+
+
 class Voter(BaseModel):
     id: str
     name: str
@@ -42,3 +46,5 @@ class Vote(BaseModel):
     voting_id: str
     nominant_id: str
     voter: Voter
+
+# TODO: Publish date

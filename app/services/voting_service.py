@@ -3,6 +3,7 @@ from fastapi import Depends
 from datetime import datetime
 
 from app.models.voting import Voting
+from app.models.nominant import Nominant
 from app.models.user import PermissionNames
 from app.models.nomination import Nomination
 from app.repositories import UsersRepo, VotingsRepo, PermissionsRepo, NominationsRepo
@@ -68,3 +69,12 @@ class VotingService:
             raise KeyError
 
         return self.votings_repo.set_active(voting)
+
+    def add_nominant(self, voting_id: UUID, nomination_id: UUID, nominant: Nominant) -> Nominant:
+        voting = self.votings_repo.get_by_id(voting_id)
+        if voting == None:
+            raise KeyError
+        if not nomination_id in [n.id for n in voting.nominations]:
+            raise ValueError
+
+        return self.nominations_repo.add_nominant(nomination_id, nominant)

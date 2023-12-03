@@ -1,8 +1,11 @@
 from uuid import UUID
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.utils.database import db_dep
+from app.models.nominant import Nominant
 from app.models.nomination import Nomination
+from app.schemas import Nominant as DbNominant
 from app.schemas import Nomination as DbNomination
 
 class NominationsRepo:
@@ -18,3 +21,14 @@ class NominationsRepo:
         self.db.commit()
 
         return Nomination.from_orm(db_nomination)
+
+    def add_nominant(self, nomination_id: UUID, nominant: Nominant):
+        nomination = self.db.execute(
+            select(DbNomination).where(DbNomination.id == nomination_id)
+        ).scalar_one()
+
+        db_nominant = DbNominant(**nominant.dict())
+        nomination.nominants.append(db_nominant)
+        self.db.commit()
+
+        return Nominant.from_orm(db_nominant)
