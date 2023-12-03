@@ -78,3 +78,10 @@ class VotingService:
             raise ValueError
 
         return self.nominations_repo.add_nominant(nomination_id, nominant)
+
+    def get_nomiantion(self, voting_id: UUID, nomination_id: UUID):
+        nomination = self.nominations_repo.get_voting_nomination(voting_id, nomination_id)
+        if nomination == None:
+            raise KeyError
+
+        return nomination

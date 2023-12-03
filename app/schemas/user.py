@@ -13,3 +13,5 @@ class User(Base):
     email: Mapped[str]
 
     permissions = relationship(UserPermission, viewonly=True)
+    
+    votes: Mapped['Vote'] = relationship(back_populates='voter')

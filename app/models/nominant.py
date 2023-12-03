@@ -14,7 +14,6 @@ class Nominant(BaseModel):
     short_description: str
     description: str
 
-
     cover_url: str
     video_url: str
 
@@ -24,3 +23,5 @@ class Nominant(BaseModel):
             self.slug = slugify(f'{self.title} {randint(0, 9999)}')
             return self
         return self
+
+# TODO: Add login.mirea

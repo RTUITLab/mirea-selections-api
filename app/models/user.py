@@ -37,5 +37,6 @@ class User(BaseModel):
     id: UUID
     name: str
     email: str
+    unit: str | None = None
 
     permissions: list[UserPermission] = []

@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.user import User
-from app.models.nomination import Nomination
+from app.models.nomination import Nomination, NominationCompact
 
 
 class Voting(BaseModel):
@@ -32,19 +32,6 @@ class CreateVotingReq(BaseModel):
 
 class ActiveVotingResp(Voting):
     users: list[User] = Field(exclude=True)
+    nominations: list[NominationCompact]
 
-
-class Voter(BaseModel):
-    id: str
-    name: str
-    email: str
-    unit: str
-
-
-class Vote(BaseModel):
-    vote_date: datetime = Field(default_factory=datetime.utcnow)
-    voting_id: str
-    nominant_id: str
-    voter: Voter
-
-# TODO: Publish date
+# TODO: PublishDate
