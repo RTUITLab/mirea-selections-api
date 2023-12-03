@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ secrets.GITLAB_REGISTRY_HOST }}/mirea-selections/api:latest
+      run: docker build . --file deploy/Dockerfile --tag ${{ secrets.GITLAB_REGISTRY_HOST }}/mirea-selections/api:latest
     - name: Login docker
       uses: docker/login-action@v3.0.0
       with:
