@@ -1,4 +1,5 @@
 from uuid import UUID
+from random import shuffle
 from fastapi import APIRouter, Depends, HTTPException, Body
 
 from app.models.nominant import Nominant
@@ -33,6 +34,7 @@ def get_nomination_info(
 ) -> UserNomination:
     try:
         nomination = UserNomination.model_validate(voting_service.get_nomiantion(voting_id, nomination_id))
+        shuffle(nomination.nominants)
         nomination.vote = user_service.get_nomination_vote(nomination.id, user_id)
 
         return nomination
