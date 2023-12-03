@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: CI/CD
 
 on:
   push:
@@ -20,4 +20,11 @@ jobs:
         password: ${{ secrets.GITLAB_REGISTRY_PAT }}
     - name: Push image
       run: docker push ${{ secrets.GITLAB_REGISTRY_HOST }}/mirea-selections/api:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Push
+      run: curl - X POST ${{ secrets.UPDATE_URL }}
         
