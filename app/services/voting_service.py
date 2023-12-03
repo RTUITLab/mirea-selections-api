@@ -26,6 +26,16 @@ class VotingService:
         self.votings_repo = votings_repo
         self.users_repo = users_repo
 
+    def get_one(self, active: bool | None = None, id: UUID | None = None) -> Voting:
+        if (active == None or active == False) and id == None:
+            return ValueError
+
+        voting = self.votings_repo.get_active() if active else self.votings_repo.get_by_id(id)
+        if voting == None:
+            raise KeyError
+
+        return voting
+
     def add_voting(self, title: str, description: str, start_date: datetime, finish_date: datetime, admin_id: UUID) -> Voting:
         voting = Voting(title=title, description=description,
                         start_date=start_date, finish_date=finish_date)
@@ -46,6 +56,15 @@ class VotingService:
         return self.votings_repo.get_by_id(voting_id)
 
     def add_student_of_year_nominations(self, voting_id: UUID) -> Voting:
-        nominations = [Nomination(title='Студент года'), Nomination(title='Преподаватель года')]
-        [self.nominations_repo.add_nomination(nom, voting_id) for nom in nominations]
+        nominations = [Nomination(title='Студент года'), Nomination(
+            title='Преподаватель года')]
+        [self.nominations_repo.add_nomination(
+            nom, voting_id) for nom in nominations]
         return self.votings_repo.get_by_id(voting_id)
+
+    def activate_voting(self, id: UUID) -> Voting:
+        voting = self.votings_repo.get_by_id(id)
+        if voting == None:
+            raise KeyError
+
+        return self.votings_repo.set_active(voting)
