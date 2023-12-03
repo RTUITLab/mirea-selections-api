@@ -80,8 +80,22 @@ class VotingService:
         return self.nominations_repo.add_nominant(nomination_id, nominant)
 
     def get_nomiantion(self, voting_id: UUID, nomination_id: UUID):
-        nomination = self.nominations_repo.get_voting_nomination(voting_id, nomination_id)
+        nomination = self.nominations_repo.get_voting_nomination(
+            voting_id, nomination_id)
         if nomination == None:
             raise KeyError
+
+        return nomination
+
+    def check_voting_status(self, voting_id: UUID, nomination_id: UUID) -> Nomination:
+        voting = self.votings_repo.get_by_id(voting_id)
+        nomination = self.nominations_repo.get_voting_nomination(
+            voting_id, nomination_id)
+        if voting == None or nomination == None:
+            raise KeyError
+
+        now = datetime.utcnow().timestamp()
+        if voting.start_date.timestamp() > now or voting.finish_date.timestamp() < now or voting.active == False:
+            raise ValueError
 
         return nomination

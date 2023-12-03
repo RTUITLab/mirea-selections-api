@@ -1,5 +1,5 @@
 from uuid import UUID
-from sqlalchemy import select
+from sqlalchemy import select, insert
 from sqlalchemy.orm import Session
 
 from app.models.user import User
@@ -17,7 +17,7 @@ class UsersRepo:
 
     def __init__(self, db: Session = db_dep) -> None:
         self.db = db
-        
+
     def get_by_id(self, id: UUID) -> User | None:
         user = self.db.execute(
             select(DbUser).where(DbUser.id == id)
@@ -27,7 +27,25 @@ class UsersRepo:
 
     def get_nomination_vote(self, user_id: UUID, nomination_id: UUID) -> Vote | None:
         vote = self.db.execute(
-            select(DbVote).where(DbVote.nomination_id == nomination_id, DbVote.voter_id == user_id)
+            select(DbVote).where(DbVote.nomination_id ==
+                                 nomination_id, DbVote.voter_id == user_id)
         ).scalar_one_or_none()
 
         return Vote.from_orm(vote) if vote != None else None
+
+    def add_vote(self, nomination_id: UUID, nominant_id: UUID, user_id: UUID) -> Vote:
+        vote = self.db.execute(
+            select(DbVote).where(DbVote.nomination_id ==
+                                 nomination_id and DbVote.voter_id == user_id)
+        ).scalar_one_or_none()
+
+        if vote != None:
+            raise ValueError
+
+        vote = DbVote(**Vote(nominant_id=nominant_id,
+                      nomination_id=nomination_id).dict(exclude='voter'))
+        vote.voter_id = user_id
+        self.db.add(vote)
+        self.db.commit()
+
+        return Vote.from_orm(vote)

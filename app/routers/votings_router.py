@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Body
 from app.models.nominant import Nominant
 from app.utils.security import JwtAuthDep
 from app.models.user import PermissionNames
-from app.models.nomination import UserNomination
+from app.models.nomination import UserNomination, UserVote
 from app.services.user_service import UserService
 from app.services.voting_service import VotingService
 from app.models.voting import Voting, CreateVotingReq, ActiveVotingResp
@@ -87,6 +87,24 @@ def add_nominant(
     except KeyError:
         raise HTTPException(status_code=404)
     except ValueError:
+        raise HTTPException(status_code=400)
+
+
+@votings_router.post('/{voting_id}/vote')
+def vote_by_user(
+    voting_id: UUID,
+    nomination_id: UUID = Body(alias='nomination_id'),
+    nominant_id: UUID = Body(alias='nominant_id'),
+    user_service: UserService = Depends(UserService),
+    voting_service: VotingService = Depends(VotingService),
+    user_id: UUID = Depends(JwtAuthDep(''))
+) -> UserVote:
+    try:
+        nomination = voting_service.check_voting_status(voting_id, nomination_id)
+        return user_service.vote(nomination.id, nominant_id, user_id)
+    except KeyError:
+        raise HTTPException(status_code=404)
+    except:
         raise HTTPException(status_code=400)
 
 

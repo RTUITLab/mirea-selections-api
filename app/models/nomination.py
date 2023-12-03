@@ -16,18 +16,23 @@ class Nomination(BaseModel):
 
 
 class Vote(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID = Field(default_factory=uuid4)
-    nominant_id: str
-    nomination_id: str
+    nominant_id: UUID
+    nomination_id: UUID
     voted_date: datetime = Field(default_factory=datetime.utcnow)
 
-    voter: User
+    voter: User | None = None
 
+
+class UserVote(Vote):
+    voter: User | None = Field(exclude=True)
 
 class UserNomination(Nomination):
     model_config = ConfigDict(from_attributes=True)
 
-    vote: Vote | None = None
+    vote: UserVote | None = None
 
 
 class NominationCompact(Nomination):

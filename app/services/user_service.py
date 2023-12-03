@@ -21,9 +21,10 @@ class UserService:
 
         return TokenResp(user_id=user.id, token=create_token(user))
 
-    def get_nomination_vote(self, nomination_id: UUID, user_id: UUID) -> Vote:
+    def get_nomination_vote(self, nomination_id: UUID, user_id: UUID) -> Vote | None:
         vote = self.users_repo.get_nomination_vote(user_id, nomination_id)
-        if vote == None:
-            raise KeyError
-
         return vote
+
+    def vote(self, nomination_id: UUID, nominant_id: UUID, user_id: UUID) -> Vote:
+        return self.users_repo.add_vote(nomination_id, nominant_id, user_id)
+        
