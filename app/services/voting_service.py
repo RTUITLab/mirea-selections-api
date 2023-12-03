@@ -2,25 +2,27 @@ from uuid import UUID
 from fastapi import Depends
 from datetime import datetime
 
-from app.models.user import PermissionNames
 from app.models.voting import Voting
-from app.repositories.permissions_repo import PermissionsRepo
-from app.repositories.votings_repo import VotingsRepo
-from app.repositories.users_repo import UsersRepo
+from app.models.user import PermissionNames
+from app.models.nomination import Nomination
+from app.repositories import UsersRepo, VotingsRepo, PermissionsRepo, NominationsRepo
 
 
 class VotingService:
     votings_repo: VotingsRepo
     users_repo: UsersRepo
     permissions_repo: PermissionsRepo
+    nominations_repo: NominationsRepo
 
     def __init__(
         self,
         votings_repo: VotingsRepo = Depends(VotingsRepo),
         permissions_repo: PermissionsRepo = Depends(PermissionsRepo),
+        nominations_repo: NominationsRepo = Depends(NominationsRepo),
         users_repo: UsersRepo = Depends(UsersRepo)
     ) -> None:
         self.permissions_repo = permissions_repo
+        self.nominations_repo = nominations_repo
         self.votings_repo = votings_repo
         self.users_repo = users_repo
 
@@ -28,8 +30,9 @@ class VotingService:
         voting = Voting(title=title, description=description,
                         start_date=start_date, finish_date=finish_date)
         self.votings_repo.create_voting(voting)
+        self.attach_admin(voting.id, admin_id)
 
-        return self.attach_admin(voting.id, admin_id)
+        return self.add_student_of_year_nominations(voting.id)
 
     def attach_admin(self, voting_id: UUID, user_id: UUID) -> Voting:
         voting = self.votings_repo.get_by_id(voting_id)
@@ -40,4 +43,9 @@ class VotingService:
         if not self.permissions_repo.add_user_permission(user_id, PermissionNames.ADMIN, voting_id):
             raise ValueError
 
+        return self.votings_repo.get_by_id(voting_id)
+
+    def add_student_of_year_nominations(self, voting_id: UUID) -> Voting:
+        nominations = [Nomination(title='Студент года'), Nomination(title='Преподаватель года')]
+        [self.nominations_repo.add_nomination(nom, voting_id) for nom in nominations]
         return self.votings_repo.get_by_id(voting_id)

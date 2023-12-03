@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env')
 
     postgres_url: str
+    jwt_secret: str
 
 
 settings = Settings()

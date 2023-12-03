@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.schemas.base_schema import Base
-from app.schemas import User, UserPermission
+from app.schemas import User, UserPermission, Nomination
 
 
 class Voting(Base):
@@ -20,4 +20,5 @@ class Voting(Base):
     start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     finish_date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
-    users: Mapped[list[User]] = relationship(secondary=UserPermission.__table__)
+    users: Mapped[list[User]] = relationship(secondary=UserPermission.__table__, viewonly=True)
+    nominations: Mapped[list[Nomination]] = relationship(viewonly=True)
