@@ -40,3 +40,11 @@ class User(BaseModel):
     unit: str | None = None
 
     permissions: list[UserPermission] = []
+
+
+class TokenResp(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    user_id: UUID
+    token: str
+    type: str = "Bearer"
