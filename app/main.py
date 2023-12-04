@@ -13,7 +13,7 @@ from app.routers.auth_router import auth_router
 from app.routers.votings_router import votings_router
 
 
-app = FastAPI()
+app = FastAPI(openapi_prefix=settings.api_prefix, docs_url=f'{settings.api_prefix}/docs')
 app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(votings_router, prefix=settings.api_prefix)
 
