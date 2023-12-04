@@ -19,7 +19,7 @@ class JwtAuthDep:
     def __call__(self, req: Request, token: str = Depends(auth_scheme)) -> UUID:
         try:
             # Very bad experience(
-            if re.match(r'\/votings\/[a-z0-9\-]{36}\/nominations\/[a-z0-9\-]{36}', req.scope['path']):
+            if re.match(r'.*\/votings\/[a-z0-9\-]{36}\/nominations\/[a-z0-9\-]{36}', req.scope['path']):
                 if token == 'Bearer ' or token == 'Bearer':
                     return UUID(int=0)
 
