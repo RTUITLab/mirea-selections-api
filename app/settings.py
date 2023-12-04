@@ -6,6 +6,7 @@ class Settings(BaseSettings):
 
     postgres_url: str
     jwt_secret: str
+    api_prefix: str = ""
 
 
 settings = Settings()
