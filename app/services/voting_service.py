@@ -99,3 +99,10 @@ class VotingService:
             raise ValueError
 
         return nomination
+
+    def delete_votes(self, voting_id: UUID) -> None:
+        voting = self.votings_repo.get_by_id(voting_id)
+
+        for n in voting.nominations:
+            self.votings_repo.delete_nomination_votes(n.id)
+        

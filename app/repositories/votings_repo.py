@@ -1,10 +1,11 @@
 from uuid import UUID
-from sqlalchemy import select, update
 from sqlalchemy.orm import Session
+from sqlalchemy import select, update, delete
 
-from app.schemas.voting import Voting as DbVoting
-from app.utils.database import db_dep
 from app.models.voting import Voting
+from app.utils.database import db_dep
+from app.schemas.vote import Vote as DbVote
+from app.schemas.voting import Voting as DbVoting
 
 votings: list[Voting] = []
 
@@ -54,3 +55,10 @@ class VotingsRepo:
         self.db.commit()
 
         return self._from_orm(new_voting)
+
+    def delete_nomination_votes(self, nomination_id: UUID) -> None:
+        self.db.execute(
+            delete(DbVote).where(DbVote.nomination_id == nomination_id)
+        )
+
+        self.db.commit()

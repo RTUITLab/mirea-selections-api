@@ -109,5 +109,12 @@ def vote_by_user(
     except:
         raise HTTPException(status_code=400)
 
+@votings_router.delete('/{voting_id}/vote')
+def clear_votes(
+    voting_id: UUID,
+    voting_service: VotingService = Depends(VotingService),
+    user_id: UUID = Depends(JwtAuthDep(''))
+) -> None:  
+    voting_service.delete_votes(voting_id)
 
 # TODO: Block after start
