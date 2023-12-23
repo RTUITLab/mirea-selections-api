@@ -25,6 +25,23 @@ class UsersRepo:
 
         return User.from_orm(user) if user != None else None
 
+    def add_user(self, user: User) -> User:
+        old_user_data = self.db.execute(
+            select(DbUser).where(DbUser.id == user.id)
+        ).scalar_one_or_none()
+
+        if (old_user_data == None):
+            user_data = DbUser(**user.dict())
+            self.db.add(user_data)
+            self.db.commit()
+            return User.from_orm(user_data)
+        else:
+            old_user_data.email = user.email
+            old_user_data.name = user.name
+            old_user_data.unit = user.unit
+            self.db.commit()
+            return User.from_orm(old_user_data)
+
     def get_nomination_vote(self, user_id: UUID, nomination_id: UUID) -> Vote | None:
         vote = self.db.execute(
             select(DbVote).where(DbVote.nomination_id ==

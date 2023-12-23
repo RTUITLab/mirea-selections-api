@@ -1,10 +1,13 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
+from fastapi.datastructures import URL
 
 from app.settings import settings
 from app.models.user import TokenResp
-from app.services.user_service import UserService
+from app.utils.security.jwt import create_token
+from app.repositories.users_repo import UsersRepo
+from app.repositories.identity_repo import IdentityRepo
 from app.repositories.redirect_url_repo import RedirectUrlRepo
 
 
@@ -21,13 +24,25 @@ def login(redirect_url: str, redirect_url_repo: RedirectUrlRepo = Depends()):
 
 
 @auth_router.get('/logincallback')
-def authorize(code: str, state: UUID, redirect_url_repo: RedirectUrlRepo = Depends()):
-    return redirect_url_repo.get_redirect_url(state) or 'bbb'
+def authorize(
+    code: str,
+    state: UUID,
+    users_repo: UsersRepo = Depends(),
+    identity_repo: IdentityRepo = Depends(),
+    redirect_url_repo: RedirectUrlRepo = Depends()
+):
+    token = identity_repo.get_token_by_code(code)
+    user = identity_repo.get_user(token)
+    users_repo.add_user(user)
 
+    redirect_url = URL(redirect_url_repo.get_redirect_url(state)).include_query_params(token=create_token(user))
 
-@auth_router.post('/token')
-def get_token(user_id: UUID, user_service: UserService = Depends(UserService)) -> TokenResp:
-    try:
-        return user_service.create_user_token(user_id)
-    except PermissionError:
-        raise HTTPException(status_code=403)
+    return RedirectResponse(redirect_url)
+    # try:
+    #     token = identity_repo.get_token_by_code(code)
+    #     user = identity_repo.get_user(token)
+    #     users_repo.add_user(user)
+
+    #     return TokenResp(user_id=user.id, token=create_token(user))
+    # except:
+    #     raise HTTPException(401)

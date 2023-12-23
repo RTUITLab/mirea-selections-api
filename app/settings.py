@@ -6,8 +6,11 @@ class Settings(BaseSettings):
 
     postgres_url: str
     memcached_server: str
-    jwt_secret: str
+    
     api_prefix: str = ""
+
+    jwt_issuer: str
+    jwt_secret: str
     
     oauth2_authorization_url: str
     oauth2_access_token_url: str

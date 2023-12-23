@@ -12,8 +12,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 6 * 60
 def create_token(user: User) -> str:
     to_encode = user.dict(exclude={'permissions'})
 
-    to_encode.update({'exp': datetime.utcnow() +
-                     timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)})
+    to_encode.update({
+        'exp': datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        'iss': settings.jwt_issuer
+    })
     to_encode['id'] = str(to_encode['id'])
     print(to_encode)
     return jwt.encode(to_encode, settings.jwt_secret, algorithm=ALGORITHM)

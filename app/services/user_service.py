@@ -14,13 +14,6 @@ class UserService:
     ) -> None:
         self.users_repo = users_repo
 
-    def create_user_token(self, user_id) -> str:
-        user = self.users_repo.get_by_id(user_id)
-        if user == None:
-            raise PermissionError
-
-        return TokenResp(user_id=user.id, token=create_token(user))
-
     def get_nomination_vote(self, nomination_id: UUID, user_id: UUID) -> Vote | None:
         vote = self.users_repo.get_nomination_vote(user_id, nomination_id)
         return vote
