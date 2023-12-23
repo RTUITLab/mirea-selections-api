@@ -21,10 +21,10 @@ jobs:
     - name: Push image
       run: docker push ${{ secrets.GITLAB_REGISTRY_HOST }}/mirea-selections/api:latest
 
-  # deploy:
-  #   runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #   - name: Push
-  #     run: curl -X POST ${{ secrets.UPDATE_URL }}
+    steps:
+    - name: Push
+      run: curl -X POST ${{ secrets.UPDATE_URL }}
         
