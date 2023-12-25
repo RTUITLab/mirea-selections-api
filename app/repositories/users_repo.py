@@ -53,7 +53,7 @@ class UsersRepo:
     def add_vote(self, nomination_id: UUID, nominant_id: UUID, user_id: UUID) -> Vote:
         vote = self.db.execute(
             select(DbVote).where(DbVote.nomination_id ==
-                                 nomination_id and DbVote.voter_id == user_id)
+                                 nomination_id).where(DbVote.voter_id == user_id)
         ).scalar_one_or_none()
 
         if vote != None:
