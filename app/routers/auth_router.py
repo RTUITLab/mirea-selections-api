@@ -31,16 +31,13 @@ def authorize(
     identity_repo: IdentityRepo = Depends(),
     redirect_url_repo: RedirectUrlRepo = Depends()
 ):
-    try:
-        token = identity_repo.get_token_by_code(code)
-        print(token)
-        user = identity_repo.get_user(token)
-        print(user)
-        users_repo.add_user(user)
-        print('User added...')
+    token = identity_repo.get_token_by_code(code)
+    print(token)
+    user = identity_repo.get_user(token)
+    print(user)
+    users_repo.add_user(user)
+    print('User added...')
 
-        redirect_url = URL(redirect_url_repo.get_redirect_url(state)).include_query_params(token=create_token(user))
+    redirect_url = URL(redirect_url_repo.get_redirect_url(state)).include_query_params(token=create_token(user))
 
-        return RedirectResponse(redirect_url)
-    except:
-        raise HTTPException(401)
+    return RedirectResponse(redirect_url)
