@@ -64,33 +64,6 @@ def create_voting(
     return voting
 
 
-@votings_router.post('/{voting_id}/activate')
-def activate_voting(
-    voting_id: UUID,
-    voting_service: VotingService = Depends(VotingService),
-    user_id: UUID = Depends(JwtAuthDep(PermissionNames.ADMIN))
-) -> Voting:
-    try:
-        return voting_service.activate_voting(voting_id)
-    except KeyError:
-        raise HTTPException(status_code=404)
-
-
-@votings_router.post('/{voting_id}/addNominant')
-def add_nominant(
-    voting_id: UUID,
-    nomination_id: UUID = Body(alias='nomination_id'),
-    nominant: Nominant = Body(alias='nominant'),
-    voting_service: VotingService = Depends(VotingService),
-    user_id: UUID = Depends(JwtAuthDep(PermissionNames.ADMIN))
-) -> Nominant:
-    try:
-        return voting_service.add_nominant(voting_id, nomination_id, nominant)
-    except KeyError:
-        raise HTTPException(status_code=404)
-    except ValueError:
-        raise HTTPException(status_code=400)
-
 
 @votings_router.post('/{voting_id}/vote')
 def vote_by_user(
@@ -109,12 +82,5 @@ def vote_by_user(
     except:
         raise HTTPException(status_code=400)
 
-@votings_router.delete('/{voting_id}/vote')
-def clear_votes(
-    voting_id: UUID,
-    voting_service: VotingService = Depends(VotingService),
-    user_id: UUID = Depends(JwtAuthDep(''))
-) -> None:  
-    voting_service.delete_votes(voting_id)
 
 # TODO: Block after start
